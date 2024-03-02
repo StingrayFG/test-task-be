@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,28 +18,37 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/projects/all", () =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateTime.Now.AddDays(index),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    try
+    {
+        var json = File.ReadAllText("./example-jsons/projects-list.json");
+        var jsonObject = JsonSerializer.Deserialize<object>(json);
+
+        return jsonObject;
+    }
+    catch
+    {
+        return Results.NotFound();
+    }
+});
+
+
+app.MapGet("/project/{name}", (string name) => 
+{
+    try
+    {
+        var json = File.ReadAllText("./example-jsons/" + name + ".json");
+        var jsonObject = JsonSerializer.Deserialize<object>(json);
+
+        return jsonObject;
+    }
+    catch 
+    {
+        return Results.NotFound();
+    }
+});
 
 app.Run();
 
-internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
