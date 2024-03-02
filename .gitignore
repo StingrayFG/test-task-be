@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+*.v2
+*.vsidx
+.vs/test-task-be/v17/.suo
